@@ -5,14 +5,13 @@
  */
 package excel;
 
+import android.content.Context;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Arrays;
 import java.util.logging.Level;
-import android.test.mock.MockContext;
 import java.util.logging.Logger;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -23,14 +22,11 @@ import org.apache.poi.ss.usermodel.Row;
  * @author Dragon
  */
 public class Excel{
-
-    /**
-     * @param args the command line arguments
-     */
+    
     @SuppressWarnings("null")
-    public static void main(String[] args) throws IOException{
+    public void readDataBase(Context context) throws IOException{
         // TODO code application logic here
-        //DataBase db = new DataBase(new MockContext());
+        DataBase db = new DataBase(context);
         
         FileInputStream file = null;
         try {
@@ -41,9 +37,11 @@ public class Excel{
         //Get the workbook instance for XLS file 
         XSSFWorkbook workbook = new XSSFWorkbook (file);
         
-        int lastYearI,lastModelI,width,currentSheet = 0;
-        String lastBrand = "",lastVersion = "", lastModelS = "";
-        String aux, lastYearS, lastPosition, lastChargeType,toShow,toShow2="";
+        int width,initDate,endDate,currentSheet = 0;
+        int serie, rin, widthRin, stop = 10;
+        long [] options = new long[4];
+        String lastBrand = "",lastVersion = "", lastModel = "";
+        String chargeIndex, rv, aux, lastYear, lastPosition, lastChargeType;
         Row row;
         Cell cell;
         Iterator<Cell> cellIterator;
@@ -55,98 +53,138 @@ public class Excel{
             //Get iterator to all the rows in current sheet
             rowIterator = sheet.iterator();
             
+            //ignore whites spaces
             rowIterator.next();
             rowIterator.next();
             rowIterator.next();
-            while(rowIterator.hasNext()) {
+            while(rowIterator.hasNext() || stop--==0) {
                 row = rowIterator.next();
 
                 //For each row, iterate through each columns
+                
+                //All models of cars
                 cellIterator = row.cellIterator();
                 aux = cellIterator.next().getStringCellValue();
                 if(!aux.equals(""))lastBrand = aux;
                 
                 cell = cellIterator.next();
                 if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-                    lastModelI = (new Double(cell.getNumericCellValue())).intValue();
-                    toShow2 = lastModelI +"";
+                    lastModel = (new Double(cell.getNumericCellValue())).intValue()+"";
                 }else{
                     if(!cell.getStringCellValue().equals("")){
-                        lastModelS = cell.getStringCellValue();
-                        toShow2 = lastModelS;
+                        lastModel = cell.getStringCellValue();
                     }
                 }
                 
-                aux = cellIterator.next().getStringCellValue();
-                if(!aux.equals(""))lastVersion = aux;
+                cell = cellIterator.next();
+                if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+                    lastVersion = (new Double(cell.getNumericCellValue())).intValue()+"";
+                }else{
+                    if(!cell.getStringCellValue().equals("")){
+                        lastVersion = cell.getStringCellValue();
+                    }
+                }
                 
                 cell = cellIterator.next();
                 if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-                    lastYearI = (new Double(cell.getNumericCellValue())).intValue();
-                    toShow = lastYearI +"";
+                    lastYear = (new Double(cell.getNumericCellValue())).intValue() + "";
                 }else{
-                    lastYearS = cell.getStringCellValue();
-                    toShow = lastYearS;
+                    lastYear = cell.getStringCellValue();
                 }
                 
                 lastPosition = cellIterator.next().getStringCellValue();
                 
                 lastChargeType = cellIterator.next().getStringCellValue();
                 
-                width = (new Double(cellIterator.next().getNumericCellValue())).intValue();
+                cell = cellIterator.next();
+                if(cell.getCellType() == Cell.CELL_TYPE_STRING){
+                    width = Integer.parseInt(cell.getStringCellValue().trim());
+                }else{
+                    width = (new Double(cell.getNumericCellValue())).intValue();
+                }
                 
-                System.out.println(lastBrand + "\t\t" + toShow2 + "\t\t" +
-                        lastVersion + "\t\t" + toShow +  "\t\t" + lastPosition +
+                //ignore gray space
+                cellIterator.next();
+                int count=0;
+                while(count < 4){
+                    serie = -1;
+                    cell = cellIterator.next();
+                    if(cell.getCellType() != Cell.CELL_TYPE_STRING){
+                        serie = (new Double(cell.getNumericCellValue())).intValue();
+                    }
+                    rin = -1;
+                    cell = cellIterator.next();
+                    if(cell.getCellType() != Cell.CELL_TYPE_STRING){
+                        rin = (new Double(cell.getNumericCellValue())).intValue();
+                    }
+                    chargeIndex = null;
+                    if(count == 0){
+                        cell = cellIterator.next();
+                        if(cell.getCellType() != Cell.CELL_TYPE_STRING){
+                            chargeIndex = (new Double(cell.getNumericCellValue())).intValue() + "";
+                        }else{
+                            chargeIndex = cell.getStringCellValue();
+                        }
+                    }
+                    cell = cellIterator.next();
+                    if(cell.getCellType() != Cell.CELL_TYPE_STRING){
+                        rv = (new Double(cell.getNumericCellValue())).intValue() + "";
+                    }else{
+                        rv = cell.getStringCellValue();
+                    }
+                    widthRin = -1;
+                    if(count != 3){
+                        cell = cellIterator.next();
+                        if(cell.getCellType() != Cell.CELL_TYPE_STRING){
+                            widthRin = (new Double(cell.getNumericCellValue())).intValue();
+                        }
+                        cellIterator.next();
+                    }
+                    
+                    options[count] = db.addRin(serie,rin,chargeIndex,rv,widthRin);
+                    if(options[count] == -1){
+                        options[count] = db.getIdRin(stop, rin, rv, rv, rin);
+                    }
+                    count++;
+                }
+                
+                lastYear = lastYear.replace("O", "0");
+                if(lastYear.length() == 5){
+                    endDate = Integer.parseInt(lastYear.substring(0,2));
+                    initDate = Integer.parseInt(lastYear.substring(3));
+                    if(initDate > endDate){
+                        initDate += 1900;
+                        endDate += 2000;
+                    }else{
+                        if(initDate < 30){
+                            initDate += 2000;
+                            endDate += 2000;
+                        }else{
+                            initDate += 1900;
+                            endDate += 1900;
+                        }
+                    }
+                    for(int ak = endDate; ak > initDate-1; ak--){
+                        db.addCar(lastBrand, lastModel, lastVersion, ak,
+                                lastPosition, lastChargeType, width, (int)options[0],
+                                (int)options[1], (int)options[2], (int)options[3]);
+                        System.out.println(lastBrand + "\t\t" + lastModel + "\t\t" +
+                            lastVersion + "\t\t" + ak +  "\t\t" + lastPosition +
+                            "\t\t" + lastChargeType +  "\t\t" + width +
+                            "\t\t" + options[0] +  "\t\t" + options[1] +
+                            "\t\t" + options[2] +  "\t\t" + options[3]);
+                    }
+                }else{
+                    db.addCar(lastBrand, lastModel, lastVersion, Integer.parseInt(lastYear),
+                                lastPosition, lastChargeType, width, (int)options[0],
+                                (int)options[1], (int)options[2], (int)options[3]);
+                    System.out.println(lastBrand + "\t\t" + lastModel + "\t\t" +
+                        lastVersion + "\t\t" + lastYear +  "\t\t" + lastPosition +
                         "\t\t" + lastChargeType +  "\t\t" + width);
+                }
             }
             currentSheet++;
         }
         file.close();
-        /*
-        Row fila;
-		Cell celda;
-		int k=0;
-	try{	
-            File archivoXLS = new File("Clientes.xls");
-            //Si el archivo existe se elimina
-            if(archivoXLS.exists()) archivoXLS.delete();
-            //Se crea el archivo
-            archivoXLS.createNewFile();
-        
-            //Se crea el libro de excel usando el objeto de tipo Workbook
-            Workbook libro = new HSSFWorkbook();
-            //Utilizamos la clase Sheet para crear una nueva hoja de trabajo dentro del libro que creamos anteriormente
-             //Se inicializa el flujo de datos con el archivo xls
-            try (FileOutputStream archivo = new FileOutputStream(archivoXLS)) {
-                //Utilizamos la clase Sheet para crear una nueva hoja de trabajo dentro del libro que creamos anteriormente
-                Sheet hoja = libro.createSheet("Clientes Registrados");
-                fila = hoja.createRow(k++);
-                celda = fila.createCell(0);
-                celda.setCellValue("Nombre");
-                celda = fila.createCell(1);
-                celda.setCellValue("Apellidos");
-                celda = fila.createCell(2);
-                celda.setCellValue("Ciudad");
-                celda = fila.createCell(3);
-                celda.setCellValue("Telefono");
-                celda = fila.createCell(4);
-                celda.setCellValue("Email");
-                celda = fila.createCell(5);
-                celda.setCellValue("Fecha de Nacimiento");
-                celda = fila.createCell(6);
-                celda.setCellValue("Tiempo");
-                celda = fila.createCell(7);
-                celda.setCellValue("Imagen");
-                //Recorremos el cursor hasta que no haya más registros
-                fila = hoja.createRow(k++);
-                for(int i=0;i<8;i++){
-                    celda = fila.createCell(i);
-                    celda.setCellValue("Prueba:"+i);
-                }   Escribimos en el libro
-                    libro.write(archivo);
-                //Cerramos el flujo de datos
-            }
-        }catch(IOException ex){
-        }*/
     }
 }
