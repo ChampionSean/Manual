@@ -35,21 +35,21 @@ public class WebAppInterface {
 
     }
     @JavascriptInterface
-    public JSONArray consulta2(String b){
+    public String consulta2(String b){
         arreglito= new String[5];
         for (int i = 0; i<arreglito.length;i++){
             arreglito[i] = "Marco";
         }
 
         switch(b){
-            case "marca": return arreJson(/*db.consultaMarcas);*/ arreglito);
-            case "modelo": return arreJson(/*db.consultaMarcas);*/ arreglito);
-            case "version":return arreJson(/*db.consultaMarcas);*/ arreglito);
-            case "ano":return arreJson(/*db.consultaMarcas);*/ arreglito);
-            case "posicion":return arreJson(/*db.consultaMarcas);*/ arreglito);
-            case "carga":return arreJson(/*db.consultaMarcas);*/ arreglito);
-            case "ancho": return arreJson(/*db.consultaMarcas);*/ arreglito);
-            default: return arreJson(new String[0]);
+            case "marca": return arreJson(/*db.consultaMarcas);*/ arreglito).toString();
+            case "modelo": return arreJson(/*db.consultaMarcas);*/ arreglito).toString();
+            case "version":return arreJson(/*db.consultaMarcas);*/ arreglito).toString();
+            case "ano":return arreJson(/*db.consultaMarcas);*/ arreglito).toString();
+            case "posicion":return arreJson(/*db.consultaMarcas);*/ arreglito).toString();
+            case "carga":return arreJson(/*db.consultaMarcas);*/ arreglito).toString();
+            case "ancho": return arreJson(/*db.consultaMarcas);*/ arreglito).toString();
+            default: return arreJson(new String[0]).toString();
 
         }
     }
