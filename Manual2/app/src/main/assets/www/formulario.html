@@ -1222,6 +1222,14 @@ s
 	  <select id="marca" onchange="consulta(this)">
           <option value="Escoge">Escoge la marca</option>
   <option value="marca">Marca</option>
+		  <option value="marca">Marca</option>
+		  <option value="marca">Marca</option>
+		  <option value="marca">Marca</option>
+		  <option value="marca">Marca</option>
+		  <option value="marca">Marca</option>
+		  <option value="marca">Marca</option>
+		  <option value="marca">Marca</option>
+		  <option value="marca">Marca</option>
 
 	  </select>
 		</form>
@@ -1229,7 +1237,7 @@ s
 
 		
 		<form id="signup-form2" method="post" action="#">
-	  <select id="modelo" onchange="consulta(this)">
+	  <select id="modelo" onchange="consulta(this)" disabled>
   <option value="modelo">Modelo</option>
 	  </select>
 		</form>
@@ -1237,7 +1245,7 @@ s
 
 <form id="signup-form3" method="post" action="#">
 			
-	  <select id=version onchange="consulta(this)">
+	  <select id=version onchange="consulta(this)" disabled>
   <option value="version">Version</option>
 	  </select>
 		</form>
@@ -1245,14 +1253,14 @@ s
 
 		<form id="signup-form4" method="post" action="#">
 			
-	  <select id="ano" onchange="consulta(this)">
+	  <select id="ano" onchange="consulta(this)" disabled>
   <option value="ano">Año</option>
 	  </select>
 		</form>
 
 
 		<form id="signup-form5" method="post" action="#">
-	  <select id="posicion" onchange="consulta(this)">
+	  <select id="posicion" onchange="consulta(this)" disabled>
   <option value="posicion">Posicion</option>
 	  </select>
 		</form>
@@ -1260,14 +1268,14 @@ s
 
 
 		<form id="signup-form6" method="post" action="#">
-	  <select id="carga" onchange="consulta(this)">
+	  <select id="carga" onchange="consulta(this)" disabled>
   <option value="carga">Tipo de Carga</option>
 	  </select>
 		</form>
 
 
 		<form id="signup-form7" method="post" action="#">
-	  <select id="ancho" onchange="consulta(this)">
+	  <select id="ancho" onchange="consulta(this)" disabled>
   <option value="ancho">Ancho</option>
 	  </select>
 		</form>
@@ -1279,19 +1287,9 @@ s
 			</footer>
 
 		<!-- Scripts -->
-
+             <script src="funciones.js"></script>
 			<script typer="text/javascript">
 
-			function consulta(element){
-	   var y = element.id;
-       var z = JSON.parse(Android.consulta2(y));
-      for(var i = 0, len = z.length; i < len; ++i){
-       var option = document.createElement("option");
-       option.text = z[i];
-       option.value = z[i];
-       element.add(option);
-       }
-    }
 				(function() {
 
 	"use strict";
